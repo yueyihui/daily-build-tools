@@ -20,7 +20,7 @@ function make()
      $GRADLE -p $PROJECT_PATH clean
      $GRADLE -p $PROJECT_PATH build
      notify $?
-     mv $DEBUG_APK $1
+     mv $DEBUG_APK "$1/debug-apk-`date +%Y%m%d%H%M`.apk"
      ftp_upload $1
 }
 
