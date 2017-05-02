@@ -22,6 +22,7 @@ function make()
      notify $?
      mv $DEBUG_APK "$1/debug-apk-`date +%Y%m%d%H%M`.apk"
      ftp_upload $1
+     $GRADLE -p $PROJECT_PATH clean
 }
 
 function notify()

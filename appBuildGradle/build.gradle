@@ -12,9 +12,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
-    lintOptions {
-        abortOnError false
-    }
     buildTypes {
         release {
             minifyEnabled false
@@ -48,6 +45,10 @@ android {
         compileTask -> compileTask.dependsOn ndkBuild
     }
 
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -61,4 +62,5 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile "com.google.code.gson:gson:2.8.0"
+    compile'com.zhy:autolayout:1.4.5'
 }
