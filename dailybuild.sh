@@ -28,11 +28,12 @@ function make()
      source $CURRENT_PATH/cp_build_gradle.sh
 
      $GRADLE -p $HOME_PANEL_PROJECT_PATH clean
+     $GRADLE -p $SIP_PROJECT_PATH clean
+
      $GRADLE -p $HOME_PANEL_PROJECT_PATH build
      notify $?
      mv $HOME_PANEL_DEBUG_APK "$1/homepanel-debug-apk-`date +%Y%m%d%H%M`.apk"
 
-     $GRADLE -p $SIP_PROJECT_PATH clean
      $GRADLE -p $SIP_PROJECT_PATH build
      notify $?
      mv $SIP_DEBUG_APK "$1/sip-debug-apk-`date +%Y%m%d%H%M`.apk"
@@ -48,7 +49,7 @@ function notify()
      if [ $1 -eq 0 ]; then
          echo -n -e "${color_success}#### make completed successfully "
      else
-         echo -n "${color_failed}#### make failed to build some targets "
+         echo -n -e "${color_failed}#### make failed to build some targets "
      fi
      echo -e " ####${color_reset}"
 }
