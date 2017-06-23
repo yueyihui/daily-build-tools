@@ -10,7 +10,7 @@ GRADLE="$HOME_PATH/$HOMEPANEL_DIE/gradlew"
 
 HOME_PANEL_PROJECT_PATH="$HOME_PATH/$HOMEPANEL_DIE"
 HOME_PANEL_OUTPUT_PATH="$HOME_PANEL_PROJECT_PATH/app/build/outputs/apk"
-HOME_PANEL_DEBUG_APK="$HOME_PANEL_OUTPUT_PATH/app-debug.apk"
+HOME_PANEL_DEBUG_APK="$HOME_PANEL_OUTPUT_PATH/TunaDebug.apk"
 
 SIP_PROJECT_PATH="$HOME_PATH/$SIP_DIE"
 SIP_OUTPUT_PATH="$SIP_PROJECT_PATH/app/build/outputs/apk"
@@ -32,11 +32,11 @@ function make()
 
      $GRADLE -p $HOME_PANEL_PROJECT_PATH build
      notify $?
-     mv $HOME_PANEL_DEBUG_APK "$1/homepanel-debug-apk-`date +%Y%m%d%H%M`.apk"
+     mv $HOME_PANEL_DEBUG_APK "$1/tuna-debug-`date +%Y%m%d%H%M`.apk"
 
      $GRADLE -p $SIP_PROJECT_PATH build
      notify $?
-     mv $SIP_DEBUG_APK "$1/sip-debug-apk-`date +%Y%m%d%H%M`.apk"
+     mv $SIP_DEBUG_APK "$1/sip-debug-`date +%Y%m%d%H%M`.apk"
 
      ftp_upload $1
 }
