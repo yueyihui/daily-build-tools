@@ -31,6 +31,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
@@ -49,6 +50,7 @@ android {
 
         }
         debug {
+            signingConfig signingConfigs.debug
             jniDebuggable true
 
             applicationVariants.all { variant ->

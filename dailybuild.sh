@@ -30,13 +30,13 @@ function make()
      $GRADLE -p $HOME_PANEL_PROJECT_PATH clean
      $GRADLE -p $SIP_PROJECT_PATH clean
 
-     $GRADLE -p $HOME_PANEL_PROJECT_PATH build
+     $GRADLE -p $HOME_PANEL_PROJECT_PATH assembleDebug
      notify $?
-     mv $HOME_PANEL_DEBUG_APK "$1/tuna-debug-`date +%Y%m%d%H%M`.apk"
+     cp $HOME_PANEL_DEBUG_APK "$1/tuna-debug-`date +%Y%m%d%H%M`.apk"
 
-     $GRADLE -p $SIP_PROJECT_PATH build
+     $GRADLE -p $SIP_PROJECT_PATH assembleDebug
      notify $?
-     mv $SIP_DEBUG_APK "$1/sip-debug-`date +%Y%m%d%H%M`.apk"
+     cp $SIP_DEBUG_APK "$1/sip-debug-`date +%Y%m%d%H%M`.apk"
 
      ftp_upload $1
 }
