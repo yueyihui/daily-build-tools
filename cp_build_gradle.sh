@@ -1,25 +1,18 @@
 #!/bin/bash
 
-local_properties="/home/liang/daily-build-tools/local.properties"
+cp "$CURRENT_PATH/local.properties" $HOME_PANEL_PROJECT_PATH
+cp "$CURRENT_PATH/local.properties" $SIP_PROJECT_PATH
+cp "$CURRENT_PATH/local.properties" $FINAL_TEST_PROJECT_PATH
 
-homepanel_build_gradle="/home/liang/daily-build-tools/HomePanelBuildGradle/build.gradle"
-homepanel_app_build_gradle="/home/liang/daily-build-tools/HomePanelAppBuildGradle/build.gradle"
-homepanel_project_path="/home/liang/HomePanel/SourceCode/HomePanel"
-homepanel_local_arm="$homepanel_project_path/app/src/main/obj/local"
+cp "$CURRENT_PATH/HomePanelBuildGradle/build.gradle" $HOME_PANEL_PROJECT_PATH
+cp "$CURRENT_PATH/HomePanelAppBuildGradle/build.gradle" "$HOME_PANEL_PROJECT_PATH/app"
 
-sip_build_gradle="/home/liang/daily-build-tools/SipBuildGradle/build.gradle"
-sip_app_build_gradle="/home/liang/daily-build-tools/SipAppBuildGradle/build.gradle"
-sip_project_path="/home/liang/HomePanel/SourceCode/SipApp"
-sip_local_arm="$sip_project_path/app/src/main/obj/local"
+cp "$CURRENT_PATH/SipBuildGradle/build.gradle" $SIP_PROJECT_PATH
+cp "$CURRENT_PATH/SipAppBuildGradle/build.gradle" "$SIP_PROJECT_PATH/app"
 
-cp $local_properties $homepanel_project_path
-cp $local_properties $sip_project_path
+cp "$CURRENT_PATH/FinalTestBuildGradle/build.gradle" $FINAL_TEST_PROJECT_PATH
+cp "$CURRENT_PATH/FinalTestAppBuildGradle/build.gradle" "$FINAL_TEST_PROJECT_PATH/app"
 
-cp $homepanel_build_gradle $homepanel_project_path
-cp $homepanel_app_build_gradle "$homepanel_project_path/app"
-
-cp $sip_build_gradle $sip_project_path
-cp $sip_app_build_gradle "$sip_project_path/app"
-
-rm -rf $homepanel_local_arm
-rm -rf $sip_local_arm
+rm -rf "$HOME_PANEL_PROJECT_PATH/app/src/main/obj/local"
+rm -rf "$SIP_PROJECT_PATH/app/src/main/obj/local"
+rm -rf "$FINAL_TEST_PROJECT_PATH/app/src/main/obj/local"

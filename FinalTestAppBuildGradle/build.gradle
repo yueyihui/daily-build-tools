@@ -4,14 +4,24 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
     defaultConfig {
-        applicationId "com.honeywell.sipapp"
-        minSdkVersion 19
+        applicationId "com.honeywell.finaltest"
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-
+    sourceSets {
+        main {
+            jni.srcDirs = []
+            jniLibs.srcDir 'src/main/libs'
+            jniLibs.srcDirs = ['src/main/libs']
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java', 'src/main/aidl']
+            resources.srcDirs = ['src/main/java', 'src/main/aidl']
+            res.srcDirs = ['src/main/res']
+            assets.srcDirs = ['src/main/assets']
+        }
+    }
     signingConfigs {
         release {
             storeFile file("../../signature/mykey_system.jks")
@@ -28,6 +38,13 @@ android {
         }
     }
 
+    task ndkBuild(type: Exec) {
+        commandLine 'ndk-build', '-C', file('src/main/').absolutePath
+    }
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -36,7 +53,7 @@ android {
                 variant.outputs.each { output ->
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        def fileName = "Sip.apk"
+                        def fileName = "FinalTest.apk"
                         output.outputFile = new File(outputFile.parent, fileName)
                     }
                 }
@@ -49,7 +66,7 @@ android {
                 variant.outputs.each { output ->
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        def fileName = "SipDebug.apk"
+                        def fileName = "FinalTestDebug.apk"
                         output.outputFile = new File(outputFile.parent, fileName)
                     }
                 }
@@ -58,35 +75,15 @@ android {
         }
     }
 
-    sourceSets {
-        main {
-            jni.srcDirs = []
-            jniLibs.srcDir 'src/main/libs'
-            java.srcDirs = ['src/main/java', 'src/main/aidl']
-            resources.srcDirs = ['src/main/java', 'src/main/aidl']
-            aidl.srcDirs = ['src/main/aidl']
-            res.srcDirs = ['src/main/res']
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
-    }
-    task ndkBuild(type: Exec) {
-        commandLine 'ndk-build', '-C', file('src/main/').absolutePath
-    }
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn ndkBuild
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError true
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
 }

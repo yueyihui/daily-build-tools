@@ -1,41 +1,56 @@
 #!/bin/bash
+function upload_files() {
+	#$1 is local path, split by / to get the remote path name that will mkdir
+	OLD_IFS="$IFS"
+	IFS="/"
+	arr=($1)
+	IFS="$OLD_IFS"
 
-################################################
-####					    ####
-####  ./ftp_upload debug-apk_dir dest_dir   ####
-####					    ####
-################################################
-dir_path="$1"
+	#we got dir name
+	local length=${#array_name[@]}
+	local dir_name=${arr[length-1]}
 
-#split dir_path by /
-OLD_IFS="$IFS"
-IFS="/"
-arr=($dir_path)
-IFS="$OLD_IFS"
+	local HOST=159.99.249.113
+	local USER=superhome
+	local PASSWD=superhome
 
-#we got dir name
-length=${#array_name[@]}
-dir_name=${arr[length-1]}
+	#put files to server
+ftp -n $HOST <<EOF
+	user $USER $PASSWD
+	binary
+	hash
+	cd $2
+	mkdir $dir_name
+	cd $dir_name
+	lcd $1
+	prompt
+	mput *
+	quit
+EOF
+}
 
-#this dir is our destination
-dest_dir="$2"
+function upload_file() {
+	OLD_IFS="$IFS"
+	IFS="/"
+	arr=($1)
+	IFS="$OLD_IFS"
 
-ip=159.99.249.113
-user=superhome
-password=superhome
+	#we got dir name
+	local length=${#array_name[@]}
+	local file_name=${arr[length-1]}
 
-#put dir to server
-ftp -n <<!
-open $ip
-user $user $password
-binary
-hash
-cd $dest_dir
-mkdir $dir_name
-cd $dest_dir/$dir_name
-lcd $dir_path
-prompt
-mput *
-close
-bye
-!
+	local dst_dir_name=`date +%Y%m%d`
+
+	local HOST=159.99.249.113
+	local USER=superhome
+	local PASSWD=superhome
+
+ftp -n $HOST <<EOF
+	user $USER $PASSWD
+	cd $2
+	mkdir $dst_dir_name
+	cd $dst_dir_name
+	put $1 $file_name
+	quit
+EOF
+}

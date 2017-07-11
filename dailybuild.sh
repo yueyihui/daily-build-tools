@@ -1,71 +1,30 @@
 #!/bin/bash
-export PATH=$PATH:/home/liang/android-ndk-r13b
 
-HOME_PATH="/home/liang"
+FTP_SERVER_IMG="/Public/homepanel/dailybuild/img"
+ANDROID_SRC="/home/liang/android6.01Src_20170602/android/"
+CURRENT_PATH="$( cd "$( dirname "$0" )" && pwd )"
 
-HOMEPANEL_DIE="HomePanel/SourceCode/HomePanel"
-SIP_DIE="HomePanel/SourceCode/SipApp"
+source $CURRENT_PATH/apk_dailybuild.sh
 
-GRADLE="$HOME_PATH/$HOMEPANEL_DIE/gradlew"
-
-HOME_PANEL_PROJECT_PATH="$HOME_PATH/$HOMEPANEL_DIE"
-HOME_PANEL_OUTPUT_PATH="$HOME_PANEL_PROJECT_PATH/app/build/outputs/apk"
-HOME_PANEL_DEBUG_APK="$HOME_PANEL_OUTPUT_PATH/TunaDebug.apk"
-
-SIP_PROJECT_PATH="$HOME_PATH/$SIP_DIE"
-SIP_OUTPUT_PATH="$SIP_PROJECT_PATH/app/build/outputs/apk"
-SIP_DEBUG_APK="$SIP_OUTPUT_PATH/app-debug.apk"
-
-#CURRENT_PATH="$(cd `dirname $0`; pwd)"
-CURRENT_PATH="$HOME_PATH/daily-build-tools"
-FTP_SERVER="/Public/homepanel/dailybuild/app"
-
-function make()
-{
-     source $CURRENT_PATH/svn_checkout_homepanel.sh
-     chmod -R 777 $HOME_PANEL_PROJECT_PATH
-     chmod -R 777 $SIP_PROJECT_PATH
-     source $CURRENT_PATH/cp_build_gradle.sh
-
-     $GRADLE -p $HOME_PANEL_PROJECT_PATH clean
-     $GRADLE -p $SIP_PROJECT_PATH clean
-
-     $GRADLE -p $HOME_PANEL_PROJECT_PATH assembleDebug
-     notify $?
-     cp $HOME_PANEL_DEBUG_APK "$1/tuna-debug-`date +%Y%m%d%H%M`.apk"
-
-     $GRADLE -p $SIP_PROJECT_PATH assembleDebug
-     notify $?
-     cp $SIP_DEBUG_APK "$1/sip-debug-`date +%Y%m%d%H%M`.apk"
-
-     ftp_upload $1
-}
-
-function notify()
-{
-     color_failed="\e[0;31m"
-     color_success="\e[0;32m"
-     color_reset="\e[00m"
-     if [ $1 -eq 0 ]; then
-         echo -n -e "${color_success}#### make completed successfully "
-     else
-         echo -n -e "${color_failed}#### make failed to build some targets "
-     fi
-     echo -e " ####${color_reset}"
-}
-
-function ftp_upload()
-{
-     source $CURRENT_PATH/ftp_upload.sh $1 $FTP_SERVER
-}
-
-function svn_checkout_homepanel()
-{
-     source $CURRENT_PATH/svn_checkout_homepanel.sh
-}
-
-TEMP_PATH="$HOME_PATH/`date +%Y%m%d`"
-if [ ! -d $TEMP_PATH ]; then
-  mkdir $TEMP_PATH
+if [ $? -eq 0 ]; then
+	cp $HOME_PANEL_DEBUG_APK $ANDROID_SRC/packages/apps/HomePanel
+	cp $SIP_DEBUG_APK $ANDROID_SRC/packages/apps/SipApp
+	cp $FINAL_TEST_DEBUG_APK $ANDROID_SRC/packages/apps/FinalTest
+	cd $ANDROID_SRC
+	source build/envsetup.sh && lunch 24
+	make -j8 2>&1 | tee build_log
+	if [ $? -eq 0 ]; then
+		pack 2>&1 | tee pack_log
+		if [ $? -eq 0 ]; then
+			ftp_upload "/home/liang/android6.01Src_20170602/lichee/tools/pack/sun50iw1p1_android_p1_uart0.img" $FTP_SERVER_IMG
+		else
+			ftp_upload "/home/liang/android6.01Src_20170602/android/pack_log" $FTP_SERVER_IMG
+		fi
+	else
+		ftp_upload "/home/liang/android6.01Src_20170602/android/build_log" $FTP_SERVER_IMG
+	fi
+else
+	local log_file="log_`date +%Y%m%d`";
+	echo "apk failed to build some targets " > "$CURRENT_PATH/log_file"
+	echo "plase to view the log from ftp://159.99.249.113/Public/homepanel/dailybuild/app/`date +%Y%m%d`" >> "$CURRENT_PATH/log_file"
 fi
-make $TEMP_PATH 2>&1 | tee "$TEMP_PATH/log"

@@ -45,6 +45,7 @@ android {
             buildConfigField("String", "DEVICETYPE", '"00210001"')
             buildConfigField("String", "DEVICESKU", '"VDP7-KA-B"')
             buildConfigField("String", "HWVERSION", '"1.0.0.0"')
+            buildConfigField("String", "SYSTEMVERSION", '"00.01.00.00"')
             signingConfig signingConfigs.release
         }
         debug {
@@ -61,6 +62,7 @@ android {
             buildConfigField("String", "DEVICETYPE", '"00210001"')
             buildConfigField("String", "DEVICESKU", '"VDP7-KA-B"')
             buildConfigField("String", "HWVERSION", '"1.0.0.0"')
+            buildConfigField("String", "SYSTEMVERSION",'"00.01.00.00"')
             signingConfig signingConfigs.debug
         }
     }
@@ -115,5 +117,6 @@ dependencies {
     compile 'com.google.zxing:core:3.3.0'
     compile 'com.lzy.net:okgo:2.1.4'
     compile 'org.nanohttpd:nanohttpd:2.3.1'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
     testCompile 'junit:junit:4.12'
 }
