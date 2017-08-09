@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FTP_SERVER_IMG="/Public/homepanel/dailybuild/img"
-ANDROID_SRC="/home/liang/android6.01Src_20170602/android/"
+ANDROID_SRC="/home/liang/android6.01Src_20170602/android"
 CURRENT_PATH="$( cd "$( dirname "$0" )" && pwd )"
 
 source $CURRENT_PATH/apk_dailybuild.sh
