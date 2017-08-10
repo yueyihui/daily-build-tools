@@ -37,18 +37,31 @@ function tuna_build()
     $GRADLE -p $FINAL_TEST_PROJECT_PATH clean
 
     $GRADLE -p $HOME_PANEL_PROJECT_PATH assembleDebug
-    notify $?
-    cp $HOME_PANEL_DEBUG_APK "$1/TunaDebug-`date +%Y%m%d%H%M`.apk"
+    if [ $? -eq 1 ]; then
+        return 1
+    else
+        notify 0
+        cp $HOME_PANEL_DEBUG_APK "$1/TunaDebug-`date +%Y%m%d%H%M`.apk"
+    fi
 
     $GRADLE -p $SIP_PROJECT_PATH assembleDebug
-    notify $?
-    cp $SIP_DEBUG_APK "$1/SipDebug-`date +%Y%m%d%H%M`.apk"
+    if [ $? -eq 1 ]; then
+        return 1
+    else
+        notify 0
+        cp $SIP_DEBUG_APK "$1/SipDebug-`date +%Y%m%d%H%M`.apk"
+    fi
 
     $GRADLE -p $FINAL_TEST_PROJECT_PATH assembleDebug
-    notify $?
-    cp $FINAL_TEST_DEBUG_APK "$1/FinalTestDebug-`date +%Y%m%d%H%M`.apk"
+    if [ $? -eq 1 ]; then
+        return 1
+    else
+        notify 0
+        cp $FINAL_TEST_DEBUG_APK "$1/FinalTestDebug-`date +%Y%m%d%H%M`.apk"
+    fi
 
     ftp_upload $1 $FTP_SERVER
+    return 0
 }
 
 function notify()
@@ -81,10 +94,10 @@ function svn_checkout_homepanel()
 
 TEMP_PATH="$HOME_PATH/`date +%Y%m%d`"
 if [ ! -d $TEMP_PATH ]; then
-  mkdir $TEMP_PATH
+    mkdir $TEMP_PATH
 else
-	rm -rf $TEMP_PATH
-	mkdir $TEMP_PATH
+    rm -rf $TEMP_PATH
+    mkdir $TEMP_PATH
 fi
-
-tuna_build $TEMP_PATH 2>&1 | tee "$TEMP_PATH/log"
+tuna_build $TEMP_PATH >"$TEMP_PATH/apk_build_log" 2>&1
+ret=$?
