@@ -2,6 +2,8 @@
 export PATH=$PATH:/opt/android-ndk
 
 HOME_PATH="/home/liang"
+PROJECT="/home/liang/HomePanel"
+REMOTE_DIR="https://acssvn.honeywell.com/HBT/Common/Home-Panel/branch/HomePanel"
 
 HOMEPANEL_DIE="HomePanel/SourceCode/HomePanel"
 SIP_DIE="HomePanel/SourceCode/SipApp"
@@ -24,13 +26,69 @@ FINAL_TEST_DEBUG_APK="$FINAL_TEST_OUTPUT_PATH/FinalTestDebug.apk"
 FTP_SERVER="/Public/homepanel/dailybuild/app"
 CURRENT_PATH=${CURRENT_PATH-$( cd "$( dirname "$0"  )" && pwd )}
 
+function upload_files() {
+    #$1 is local path, split by / to get the remote path name that will mkdir
+    OLD_IFS="$IFS"
+    IFS="/"
+    arr=($1)
+    IFS="$OLD_IFS"
+
+    #we got dir name
+    local length=${#array_name[@]}
+    local dir_name=${arr[length-1]}
+
+    local HOST=159.99.249.113
+    local USER=superhome
+    local PASSWD=superhome
+
+    #put files to server
+ftp -n $HOST <<EOF
+    user $USER $PASSWD
+    binary
+    hash
+    cd $2
+    mkdir $dir_name
+    cd $dir_name
+    lcd $1
+    prompt
+    mput *
+    quit
+EOF
+}
+
+function upload_file() {
+    OLD_IFS="$IFS"
+    IFS="/"
+    arr=($1)
+    IFS="$OLD_IFS"
+
+    #we got dir name
+    local length=${#array_name[@]}
+    local file_name=${arr[length-1]}
+
+    local dst_dir_name=`date +%Y%m%d`
+
+    local HOST=159.99.249.113
+    local USER=superhome
+    local PASSWD=superhome
+
+ftp -n $HOST <<EOF
+    user $USER $PASSWD
+    cd $2
+    mkdir $dst_dir_name
+    cd $dst_dir_name
+    put $1 $file_name
+    quit
+EOF
+}
+
 function tuna_build()
 {
-    source $CURRENT_PATH/svn_checkout_homepanel.sh
+    svn_go
     chmod -R 777 $HOME_PANEL_PROJECT_PATH
     chmod -R 777 $SIP_PROJECT_PATH
     chmod -R 777 $FINAL_TEST_PROJECT_PATH
-    source $CURRENT_PATH/cp_build_gradle.sh
+    cp_build_gradle
 
     $GRADLE -p $HOME_PANEL_PROJECT_PATH clean
     $GRADLE -p $SIP_PROJECT_PATH clean
@@ -87,9 +145,47 @@ function ftp_upload()
     fi
 }
 
-function svn_checkout_homepanel()
+function checkout()
 {
-    source $CURRENT_PATH/svn_checkout_homepanel.sh
+    svn checkout $REMOTE_DIR $LOCAL_DIR
+}
+
+function update()
+{
+  local local_version=`svn info $LOCAL_DIR | grep Revision|awk -F: '{ print $2}'`
+  echo Local version is $local_version
+  local remote_version=`svn info $REMOTE_DIR | grep Revision|awk -F: '{ print $2}'`
+  echo Repo version is $remote_version
+  if [ "$local_version" != "$remote_version" ]; then
+     svn update $LOCAL_DIR
+     if [ $? -ne 0 ];then
+         echo "update local version:$local_version to remote version:$remote_version failure!!!"
+     fi
+  fi
+}
+
+function svn_go()
+{
+  if [ ! -d $LOCAL_DIR ]; then
+      checkout
+  else
+      update
+  fi
+}
+
+function cp_build_gradle()
+{
+    cp "$CURRENT_PATH/local.properties" $HOME_PANEL_PROJECT_PATH
+    cp "$CURRENT_PATH/local.properties" $SIP_PROJECT_PATH
+    cp "$CURRENT_PATH/local.properties" $FINAL_TEST_PROJECT_PATH
+
+    cp "$CURRENT_PATH/HomePanelBuildGradle/build.gradle" $HOME_PANEL_PROJECT_PATH
+    cp "$CURRENT_PATH/SipBuildGradle/build.gradle" $SIP_PROJECT_PATH
+    cp "$CURRENT_PATH/FinalTestBuildGradle/build.gradle" $FINAL_TEST_PROJECT_PATH
+
+    rm -rf "$HOME_PANEL_PROJECT_PATH/app/src/main/obj/local"
+    rm -rf "$SIP_PROJECT_PATH/app/src/main/obj/local"
+    rm -rf "$FINAL_TEST_PROJECT_PATH/app/src/main/obj/local"
 }
 
 TEMP_PATH="$HOME_PATH/`date +%Y%m%d`"
