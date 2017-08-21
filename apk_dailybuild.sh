@@ -147,17 +147,17 @@ function ftp_upload()
 
 function checkout()
 {
-    svn checkout $REMOTE_DIR $LOCAL_DIR
+    svn checkout $REMOTE_DIR $PROJECT
 }
 
 function update()
 {
-  local local_version=`svn info $LOCAL_DIR | grep Revision|awk -F: '{ print $2}'`
+  local local_version=`svn info $PROJECT | grep Revision|awk -F: '{ print $2}'`
   echo Local version is $local_version
   local remote_version=`svn info $REMOTE_DIR | grep Revision|awk -F: '{ print $2}'`
   echo Repo version is $remote_version
   if [ "$local_version" != "$remote_version" ]; then
-     svn update $LOCAL_DIR
+     svn update $PROJECT
      if [ $? -ne 0 ];then
          echo "update local version:$local_version to remote version:$remote_version failure!!!"
      fi
@@ -166,7 +166,7 @@ function update()
 
 function svn_go()
 {
-  if [ ! -d $LOCAL_DIR ]; then
+  if [ ! -d $PROJECT ]; then
       checkout
   else
       update
