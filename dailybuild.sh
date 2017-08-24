@@ -6,7 +6,7 @@ CURRENT_PATH="$( cd "$( dirname "$0" )" && pwd )"
 
 function make_android()
 {
-if [ $1 -eq 0 ]; then
+if [ $1 -eq 0 ] || [ "$1" = "0" ]; then
     cp $HOME_PANEL_DEBUG_APK $ANDROID_SRC/packages/apps/HomePanel
     cp $SIP_DEBUG_APK $ANDROID_SRC/packages/apps/SipApp
     cp $FINAL_TEST_DEBUG_APK $ANDROID_SRC/packages/apps/FinalTest
@@ -25,10 +25,11 @@ if [ $1 -eq 0 ]; then
     fi
 else
     notify 1
-    echo "retval is $1" > "$TEMP_PATH/android_make_log"
+    echo "retval is $1" >> "$TEMP_PATH/android_make_log"
     echo "apk failed to build some targets " >> "$TEMP_PATH/android_make_log"
 fi
 }
 
 source $CURRENT_PATH/apk_dailybuild.sh
+echo "ret: $ret" > "$TEMP_PATH/android_make_log"
 make_android $ret
