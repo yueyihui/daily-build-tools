@@ -66,7 +66,7 @@ function upload_file() {
     local length=${#array_name[@]}
     local file_name=${arr[length-1]}
 
-    local dst_dir_name=`date +%Y%m%d`
+    local dist_dir="dailybuild-`date +%Y%m%d`"
 
     local HOST=159.99.249.113
     local USER=superhome
@@ -75,8 +75,8 @@ function upload_file() {
 ftp -n $HOST <<EOF
     user $USER $PASSWD
     cd $2
-    mkdir $dst_dir_name
-    cd $dst_dir_name
+    mkdir $dist_dir
+    cd $dist_dir
     put $1 $file_name
     quit
 EOF
@@ -137,7 +137,6 @@ function notify()
 
 function ftp_upload()
 {
-    source $CURRENT_PATH/ftp_upload.sh
     if [ -d $1 ]; then
         upload_files $1 $2
     else
