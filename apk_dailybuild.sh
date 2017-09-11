@@ -42,18 +42,18 @@ function upload_files() {
     local PASSWD=superhome
 
     #put files to server
-ftp -n $HOST <<EOF
+ftp -n $HOST <<FTP_SCRIPT
     user $USER $PASSWD
     binary
-    hash
     cd $2
     mkdir $dir_name
     cd $dir_name
     lcd $1
     prompt
     mput *
+    bye
     quit
-EOF
+FTP_SCRIPT
 }
 
 function upload_file() {
@@ -72,14 +72,16 @@ function upload_file() {
     local USER=superhome
     local PASSWD=superhome
 
-ftp -n $HOST <<EOF
+ftp -n $HOST <<FTP_SCRIPT
     user $USER $PASSWD
+    binary
     cd $2
     mkdir $dist_dir
     cd $dist_dir
     put $1 $file_name
+    bye
     quit
-EOF
+FTP_SCRIPT
 }
 
 function tuna_build()
@@ -118,7 +120,6 @@ function tuna_build()
         cp $FINAL_TEST_DEBUG_APK "$1/FinalTestDebug-`date +%Y%m%d%H%M`.apk"
     fi
 
-    ftp_upload $1 $FTP_SERVER
     return 0
 }
 
@@ -197,3 +198,6 @@ fi
 tuna_build $TEMP_PATH >"$TEMP_PATH/apk_build_log" 2>&1
 ret=$?
 echo "tuna_build return $ret" >> "$TEMP_PATH/apk_build_log"
+if [ $ret -eq 0 ]; then
+     ftp_upload $TEMP_PATH $FTP_SERVER
+fi
